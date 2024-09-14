@@ -38,6 +38,19 @@ async function fetchTopMovies() {
 	}
 }
 
+const readFile = () => {
+	try {
+		const fileContent = fs.readFileSync(filePath, 'utf-8')
+		const movies = JSON.parse(fileContent)
+
+		return movies
+	} catch (error) {
+		console.error('Ошибка при чтении файла:', error)
+		res.status(500).send('Внутренняя ошибка сервера')
+	}
+}
+
 module.exports = {
 	fetchTopMovies,
+	readFile,
 }

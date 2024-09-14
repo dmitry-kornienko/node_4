@@ -1,11 +1,11 @@
 const express = require('express')
 const app = express()
+const filmsRouter = require('./routes/films')
 
 const { fetchTopMovies } = require('./utils')
 
-app.get('/', (req, res) => {
-	res.send('Hello World!')
-})
+app.use(express.json())
+app.use('/api/films', filmsRouter)
 
 app.listen(3000, async () => {
 	console.log('Example app listening on port 3000!')
