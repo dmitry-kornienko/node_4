@@ -45,12 +45,59 @@ const readFile = () => {
 
 		return movies
 	} catch (error) {
-		console.error('Ошибка при чтении файла:', error)
-		res.status(500).send('Внутренняя ошибка сервера')
+		throw new Error('Failed to read file')
 	}
+}
+
+const writeFile = data => {
+	try {
+		fs.writeFileSync(filePath, JSON.stringify(data, null, 2))
+	} catch (error) {
+		throw new Error('Failed to write file')
+	}
+}
+
+const updateMoviePosition = (movieId, newPosition) => {
+	let movies = readFile()
+	const targetMovieIndex = movies.findIndex(m => m.id === movieId)
+	if (targetMovieIndex === -1) {
+		return { error: 'Movie not found' }
+	}
+
+	const targetMovie = movies[targetMovieIndex]
+	const oldPosition = targetMovie.position
+
+	if (oldPosition === newPosition) {
+		return movies
+	}
+
+	movies.splice(targetMovieIndex, 1)
+	targetMovie.position = newPosition
+
+	if (newPosition < oldPosition) {
+		movies = movies.map(movie => {
+			if (movie.position >= newPosition && movie.position < oldPosition) {
+				movie.position += 1
+			}
+			return movie
+		})
+	} else {
+		movies = movies.map(movie => {
+			if (movie.position > oldPosition && movie.position <= newPosition) {
+				movie.position -= 1
+			}
+			return movie
+		})
+	}
+
+	movies.splice(newPosition - 1, 0, targetMovie)
+
+	return movies
 }
 
 module.exports = {
 	fetchTopMovies,
 	readFile,
+	writeFile,
+	updateMoviePosition,
 }

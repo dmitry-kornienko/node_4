@@ -5,6 +5,7 @@ const filmsRouter = require('./routes/films')
 const { fetchTopMovies } = require('./utils')
 
 app.use(express.json())
+
 app.use('/api/films', filmsRouter)
 
 app.listen(3000, async () => {
