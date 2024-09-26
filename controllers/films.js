@@ -4,6 +4,12 @@ const { createMovieValidator, updateMovieValidator } = require('../validator')
 module.exports = filmsController = {
 	readAll: (req, res) => {
 		try {
+			const user = req.user
+
+			if (!user) {
+				return res.status(403).send('User not found')
+			}
+
 			const movies = readFile()
 			res.json(movies)
 		} catch (error) {
@@ -13,6 +19,12 @@ module.exports = filmsController = {
 
 	read: (req, res) => {
 		try {
+			const user = req.user
+
+			if (!user) {
+				return res.status(403).send('User not found')
+			}
+
 			const { id } = req.body
 			const movies = readFile()
 			const targetMovie = movies.find(m => m.id === id)
@@ -29,8 +41,13 @@ module.exports = filmsController = {
 	},
 
 	create: (req, res) => {
-		console.log('create1')
 		try {
+			const user = req.user
+
+			if (!user.super) {
+				return res.status(403).send('Insufficient access rights')
+			}
+
 			const { isValid, errors } = createMovieValidator(req.body)
 
 			if (!isValid) {
@@ -45,7 +62,6 @@ module.exports = filmsController = {
 			)
 
 			if (samePositionMovieIndex !== -1) {
-				console.log('create2')
 				movies.splice(samePositionMovieIndex, 0, newMovie)
 				for (let i = samePositionMovieIndex + 1; i < movies.length; i++) {
 					movies[i].position += 1
@@ -62,7 +78,6 @@ module.exports = filmsController = {
 				res.status(201).json(newMovie)
 				return
 			}
-			console.log('create4')
 		} catch (error) {
 			res.status(500).send('Server error')
 		}
@@ -70,6 +85,12 @@ module.exports = filmsController = {
 
 	update: (req, res) => {
 		try {
+			const user = req.user
+
+			if (!user.super) {
+				return res.status(403).send('Insufficient access rights')
+			}
+
 			const data = req.body
 			const { isValid, errors } = updateMovieValidator(data)
 
@@ -106,6 +127,12 @@ module.exports = filmsController = {
 
 	delete: (req, res) => {
 		try {
+			const user = req.user
+
+			if (!user.super) {
+				return res.status(403).send('Insufficient access rights')
+			}
+
 			const { id } = req.body
 
 			let movies = readFile()

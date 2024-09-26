@@ -95,9 +95,38 @@ const updateMoviePosition = (movieId, newPosition) => {
 	return movies
 }
 
+const readAllManagers = () => {
+	try {
+		const managersContent = fs.readFileSync(
+			path.join(__dirname, 'managers.json'),
+			'utf-8'
+		)
+		const managers = JSON.parse(managersContent)
+
+		return managers
+	} catch (error) {
+		throw new Error('Failed to read managers')
+	}
+}
+
+const registerNewManager = manager => {
+	try {
+		const managers = readAllManagers()
+		managers.push(manager)
+		fs.writeFileSync(
+			path.join(__dirname, 'managers.json'),
+			JSON.stringify(managers, null, 2)
+		)
+	} catch (error) {
+		throw new Error('Failed to write new manager')
+	}
+}
+
 module.exports = {
 	fetchTopMovies,
 	readFile,
 	writeFile,
 	updateMoviePosition,
+	readAllManagers,
+	registerNewManager,
 }
